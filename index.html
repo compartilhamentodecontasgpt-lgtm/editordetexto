@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<title>Editor Profissional de eBook</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#e8e8e8;
+}
+
+header{
+background:#111;
+color:white;
+padding:20px;
+text-align:center;
+font-size:24px;
+}
+
+.toolbar{
+background:white;
+padding:10px;
+border-bottom:1px solid #ccc;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.toolbar button{
+padding:8px;
+margin:3px;
+font-size:14px;
+cursor:pointer;
+}
+
+.page{
+background:white;
+width:210mm;
+min-height:297mm;
+margin:auto;
+margin-top:30px;
+padding:3cm;
+box-shadow:0 0 15px rgba(0,0,0,0.2);
+}
+
+.editor{
+outline:none;
+font-size:12pt;
+line-height:1.5;
+text-align:justify;
+}
+
+.editor h1{
+text-align:center;
+font-size:16pt;
+}
+
+.editor h2{
+font-size:14pt;
+}
+
+.cover{
+width:210mm;
+height:297mm;
+margin:auto;
+margin-top:30px;
+background:white;
+box-shadow:0 0 15px rgba(0,0,0,0.2);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:40px;
+}
+
+.cover img{
+max-width:300px;
+margin-top:20px;
+}
+
+.cover h1{
+font-size:28px;
+}
+
+.cover h2{
+font-size:20px;
+font-weight:normal;
+}
+
+.config{
+background:white;
+padding:20px;
+margin:20px;
+text-align:center;
+}
+
+.config input{
+padding:8px;
+margin:5px;
+width:250px;
+}
+
+.sumario{
+background:white;
+width:210mm;
+margin:auto;
+margin-top:20px;
+padding:2cm;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+.sumario h2{
+text-align:center;
+}
+
+.sumario ul{
+list-style:none;
+padding:0;
+}
+
+.sumario li{
+padding:4px;
+border-bottom:1px dotted #ccc;
+}
+
+@media print{
+
+header,
+.toolbar,
+.config{
+display:none;
+}
+
+.page,
+.cover,
+.sumario{
+box-shadow:none;
+margin:0;
+}
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<header>
+Editor Profissional de eBook
+</header>
+
+
+<div class="toolbar">
+
+<button onclick="format('bold')">Negrito</button>
+<button onclick="format('italic')">Itálico</button>
+<button onclick="format('underline')">Sublinhar</button>
+
+<button onclick="format('justifyLeft')">Esquerda</button>
+<button onclick="format('justifyCenter')">Centro</button>
+<button onclick="format('justifyRight')">Direita</button>
+<button onclick="format('justifyFull')">Justificado</button>
+
+<button onclick="titulo()">Título</button>
+<button onclick="subtitulo()">Subtítulo</button>
+
+<button onclick="imagem()">Inserir imagem</button>
+
+<button onclick="abnt()">ABNT</button>
+
+<button onclick="gerarSumario()">Gerar Sumário</button>
+
+<button onclick="window.print()">Exportar PDF</button>
+
+</div>
+
+
+
+<div class="config">
+
+<h2>Configuração da Capa</h2>
+
+<input id="tituloLivro" placeholder="Título do Livro"><br>
+
+<input id="autorLivro" placeholder="Autor"><br>
+
+<input type="file" id="imagemCapa"><br>
+
+<button onclick="gerarCapa()">Criar Capa</button>
+
+</div>
+
+
+
+<div id="capa" class="cover">
+
+<h1>Título do Livro</h1>
+
+<h2>Autor</h2>
+
+</div>
+
+
+
+<div id="sumario" class="sumario">
+
+<h2>Sumário</h2>
+
+<ul id="listaSumario"></ul>
+
+</div>
+
+
+
+<div class="page">
+
+<div id="editor" class="editor" contenteditable="true">
+
+<h1>Capítulo 1</h1>
+
+<p>
+Comece a escrever seu livro aqui.
+Este editor já está configurado para formato A4.
+</p>
+
+<p>
+Você pode inserir títulos, imagens, referências e depois exportar tudo para PDF.
+</p>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+function format(cmd){
+document.execCommand(cmd,false,null)
+}
+
+function titulo(){
+document.execCommand("insertHTML",false,"<h1>Novo Capítulo</h1>")
+}
+
+function subtitulo(){
+document.execCommand("insertHTML",false,"<h2>Subtítulo</h2>")
+}
+
+function imagem(){
+
+let url = prompt("Cole o link da imagem")
+
+if(url){
+document.execCommand("insertImage",false,url)
+}
+
+}
+
+function abnt(){
+
+let e = document.getElementById("editor")
+
+e.style.fontFamily="Arial"
+e.style.fontSize="12pt"
+e.style.lineHeight="1.5"
+e.style.textAlign="justify"
+
+alert("Formatação ABNT aplicada")
+
+}
+
+function gerarCapa(){
+
+let titulo = document.getElementById("tituloLivro").value
+let autor = document.getElementById("autorLivro").value
+let img = document.getElementById("imagemCapa").files[0]
+
+let capa = document.getElementById("capa")
+
+capa.innerHTML = "<h1>"+titulo+"</h1><h2>"+autor+"</h2>"
+
+if(img){
+
+let reader = new FileReader()
+
+reader.onload=function(e){
+
+let imagem=document.createElement("img")
+imagem.src=e.target.result
+
+capa.appendChild(imagem)
+
+}
+
+reader.readAsDataURL(img)
+
+}
+
+}
+
+function gerarSumario(){
+
+let titulos = document.querySelectorAll("#editor h1")
+
+let lista = document.getElementById("listaSumario")
+
+lista.innerHTML=""
+
+titulos.forEach((t,i)=>{
+
+let li=document.createElement("li")
+
+li.innerText=(i+1)+" - "+t.innerText
+
+lista.appendChild(li)
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
