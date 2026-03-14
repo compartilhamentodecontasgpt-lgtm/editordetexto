@@ -1,345 +1,283 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Editor Profissional de eBook</title>
+<title>Editor de eBook</title>
 
 <style>
 
 body{
-margin:0;
 font-family:Arial;
-background:#e5e5e5;
-}
-
-header{
 background:#111;
-color:white;
-padding:15px;
-font-size:24px;
-text-align:center;
+color:#eee;
+margin:0;
 }
 
 .toolbar{
-background:white;
+background:#1c1c1c;
 padding:10px;
+position:sticky;
+top:0;
 display:flex;
-flex-wrap:wrap;
-justify-content:center;
-border-bottom:1px solid #ccc;
+gap:10px;
+border-bottom:1px solid #333;
 }
 
-.toolbar button{
-padding:8px 12px;
-margin:4px;
-font-size:14px;
+button{
+background:#2c2c2c;
+color:white;
+border:none;
+padding:8px 14px;
 cursor:pointer;
-border:1px solid #ccc;
-background:white;
+border-radius:5px;
 }
 
-.toolbar button:hover{
-background:#eee;
+button:hover{
+background:#444;
 }
 
-.config{
-background:white;
-padding:20px;
-margin:20px;
-text-align:center;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-
-.config input{
-padding:8px;
-margin:5px;
-width:260px;
-}
-
-.cover{
-width:210mm;
-height:297mm;
-margin:auto;
-background:white;
-margin-top:20px;
+.container{
 display:flex;
-flex-direction:column;
-align-items:center;
 justify-content:center;
-box-shadow:0 0 15px rgba(0,0,0,0.2);
-text-align:center;
 }
 
-.cover img{
-max-width:350px;
-margin-top:20px;
+.book{
+width:820px;
+background:white;
+color:black;
+padding:40px;
+margin:40px;
+box-shadow:0 0 20px rgba(0,0,0,0.7);
 }
 
 .page{
-background:white;
-width:210mm;
-min-height:297mm;
-margin:auto;
-margin-top:20px;
-padding:3cm;
-box-shadow:0 0 15px rgba(0,0,0,0.2);
+page-break-after:always;
+margin-bottom:60px;
+}
+
+.cover{
+height:1000px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+background-size:cover;
+background-position:center;
+color:white;
+}
+
+.cover-overlay{
+background:rgba(0,0,0,0.6);
+padding:60px;
+width:100%;
+height:100%;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
+.cover h1{
+font-size:48px;
+margin:20px;
+}
+
+.cover h2{
+font-size:24px;
+font-weight:normal;
 }
 
 .editor{
-outline:none;
-font-size:12pt;
-line-height:1.5;
-text-align:justify;
+min-height:200px;
+border:1px dashed #aaa;
+padding:20px;
 }
 
-.editor h1{
-text-align:center;
-font-size:18pt;
-margin-top:40px;
-}
-
-.editor h2{
-font-size:14pt;
-margin-top:20px;
-}
-
-.sumario{
-background:white;
-width:210mm;
-margin:auto;
-margin-top:20px;
-padding:2cm;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-}
-
-.sumario h2{
-text-align:center;
-}
-
-.sumario ul{
-list-style:none;
-padding:0;
-}
-
-.sumario li{
-padding:6px;
-border-bottom:1px dotted #ccc;
+img{
+max-width:100%;
+margin:10px 0;
 }
 
 @media print{
 
-header,
-.toolbar,
-.config{
+body{
+background:white;
+}
+
+.toolbar{
 display:none;
 }
 
-.cover,
-.page,
-.sumario{
+.book{
 box-shadow:none;
 margin:0;
+width:100%;
 }
 
 }
 
 </style>
-</head>
 
+</head>
 
 <body>
 
-<header>
-Editor Profissional de eBook
-</header>
-
-
 <div class="toolbar">
 
-<button onclick="format('bold')">Negrito</button>
-<button onclick="format('italic')">Itálico</button>
-<button onclick="format('underline')">Sublinhar</button>
+<button onclick="addChapter()">Novo Capítulo</button>
 
-<button onclick="format('justifyLeft')">Esquerda</button>
-<button onclick="format('justifyCenter')">Centro</button>
-<button onclick="format('justifyRight')">Direita</button>
-<button onclick="format('justifyFull')">Justificado</button>
+<button onclick="addImage()">Inserir Imagem</button>
 
-<button onclick="titulo()">Capítulo</button>
-<button onclick="subtitulo()">Subtítulo</button>
+<button onclick="generateSummary()">Gerar Sumário</button>
 
-<button onclick="imagem()">Inserir imagem</button>
+<button onclick="printBook()">Exportar PDF</button>
 
-<button onclick="abnt()">Formatação ABNT</button>
-
-<button onclick="gerarSumario()">Gerar Sumário</button>
-
-<button onclick="salvar()">Salvar projeto</button>
-
-<button onclick="window.print()">Exportar PDF</button>
+<input type="file" id="coverUpload" accept="image/*">
 
 </div>
 
+<div class="container">
 
+<div class="book" id="book">
 
-<div class="config">
+<div class="page cover" id="cover">
 
-<h2>Criar capa do livro</h2>
+<div class="cover-overlay">
 
-<input id="tituloLivro" placeholder="Título do livro"><br>
+<h1 contenteditable="true">Título do Livro</h1>
 
-<input id="autorLivro" placeholder="Autor"><br>
-
-<input type="file" id="imagemCapa"><br>
-
-<button onclick="gerarCapa()">Gerar capa</button>
+<h2 contenteditable="true">Autor</h2>
 
 </div>
 
-
-
-<div id="capa" class="cover">
-
-<h1>Título do Livro</h1>
-
-<h2>Autor</h2>
-
 </div>
 
-
-
-<div id="sumario" class="sumario">
+<div class="page" id="summary">
 
 <h2>Sumário</h2>
 
-<ul id="listaSumario"></ul>
+<ul id="summaryList"></ul>
 
 </div>
 
+<div class="page chapter">
 
+<h2 contenteditable="true">Capítulo 1</h2>
 
-<div class="page">
+<div class="editor" contenteditable="true">
 
-<div id="editor" class="editor" contenteditable="true">
-
-<h1>Capítulo 1</h1>
-
-<p>
-Comece a escrever seu livro aqui.
-</p>
-
-<p>
-Você pode criar capítulos, inserir imagens, gerar sumário e depois exportar o livro em PDF.
-</p>
+Comece a escrever seu livro aqui...
 
 </div>
 
 </div>
 
+</div>
 
+</div>
 
 <script>
 
-function format(cmd){
-document.execCommand(cmd,false,null)
-}
+function addChapter(){
 
-function titulo(){
-document.execCommand("insertHTML",false,"<h1>Novo Capítulo</h1>")
-}
+let book = document.getElementById("book")
 
-function subtitulo(){
-document.execCommand("insertHTML",false,"<h2>Subtítulo</h2>")
-}
+let count = document.querySelectorAll(".chapter").length + 1
 
-function imagem(){
+let chapter = document.createElement("div")
 
-let url = prompt("Cole o link da imagem")
+chapter.className="page chapter"
 
-if(url){
-document.execCommand("insertImage",false,url)
-}
+chapter.innerHTML=`
 
-}
+<h2 contenteditable="true">Capítulo ${count}</h2>
 
-function abnt(){
+<div class="editor" contenteditable="true">
 
-let e = document.getElementById("editor")
+Escreva o conteúdo...
 
-e.style.fontFamily="Arial"
-e.style.fontSize="12pt"
-e.style.lineHeight="1.5"
-e.style.textAlign="justify"
+</div>
 
-alert("Formatação ABNT aplicada")
+`
+
+book.appendChild(chapter)
 
 }
 
-function gerarCapa(){
+function generateSummary(){
 
-let titulo = document.getElementById("tituloLivro").value
-let autor = document.getElementById("autorLivro").value
-let img = document.getElementById("imagemCapa").files[0]
+let list = document.getElementById("summaryList")
 
-let capa = document.getElementById("capa")
+list.innerHTML=""
 
-capa.innerHTML="<h1>"+titulo+"</h1><h2>"+autor+"</h2>"
+let chapters=document.querySelectorAll(".chapter h2")
 
-if(img){
-
-let reader = new FileReader()
-
-reader.onload=function(e){
-
-let imagem=document.createElement("img")
-
-imagem.src=e.target.result
-
-capa.appendChild(imagem)
-
-}
-
-reader.readAsDataURL(img)
-
-}
-
-}
-
-function gerarSumario(){
-
-let titulos=document.querySelectorAll("#editor h1")
-
-let lista=document.getElementById("listaSumario")
-
-lista.innerHTML=""
-
-titulos.forEach((t,i)=>{
+chapters.forEach((c,i)=>{
 
 let li=document.createElement("li")
 
-li.innerText=(i+1)+" - "+t.innerText
+li.innerText=c.innerText
 
-lista.appendChild(li)
+list.appendChild(li)
 
 })
 
 }
 
-function salvar(){
+function addImage(){
 
-let conteudo=document.getElementById("editor").innerHTML
+let input=document.createElement("input")
 
-let blob=new Blob([conteudo],{type:"text/html"})
+input.type="file"
 
-let link=document.createElement("a")
+input.accept="image/*"
 
-link.href=URL.createObjectURL(blob)
+input.onchange=e=>{
 
-link.download="livro.html"
+let file=e.target.files[0]
 
-link.click()
+let reader=new FileReader()
+
+reader.onload=function(ev){
+
+let img=document.createElement("img")
+
+img.src=ev.target.result
+
+document.activeElement.appendChild(img)
 
 }
+
+reader.readAsDataURL(file)
+
+}
+
+input.click()
+
+}
+
+function printBook(){
+
+window.print()
+
+}
+
+document.getElementById("coverUpload").addEventListener("change",function(e){
+
+let file=e.target.files[0]
+
+let reader=new FileReader()
+
+reader.onload=function(ev){
+
+document.getElementById("cover").style.backgroundImage=`url(${ev.target.result})`
+
+}
+
+reader.readAsDataURL(file)
+
+})
 
 </script>
 
